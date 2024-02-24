@@ -1,0 +1,51 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: staging
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: express
+  namespace: staging
+  labels:
+    app: express
+spec:  # Corrected "specs" to "spec"
+  replicas: 2
+  selector:
+    matchLabels:
+      app: express
+  template:
+    metadata:
+      labels:
+        app: express
+    spec:  # Corrected "specs" to "spec"
+      containers:
+      - name: express
+        image: docker.io/ryuk17/task_manager:tag
+        imagePullPolicy: Always
+        ports:
+        - name: http
+          containerPort: 3000
+        resources:
+          requests:
+            memory: 64Mi
+            cpu: 100m
+          limits:
+            memory: 128Mi
+            cpu: 300m
+        imagePullSecrets:
+        - name: dockerhub-secret
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: express
+  namespace: staging
+spec:
+  selector:
+    app: express
+  ports:
+  - protocol: TCP
+    port: 3000
